@@ -1,0 +1,461 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════
+   GLAMOUR NAILS STUDIO — Design System
+   ═══════════════════════════════════════════ */
+
+@theme {
+  /* ── Colores Rosa / Turquesa ── */
+  --color-pink-50: #FFF0F7;
+  --color-pink-100: #FFD6EE;
+  --color-pink-200: #FFB3E0;
+  --color-pink-300: #FF85CA;
+  --color-pink-400: #FF5DB8;
+  --color-pink-500: #FF3DA8;
+  --color-pink-600: #E0258E;
+  --color-pink-700: #B81C70;
+  --color-purple-400: #4DD0E1;
+  --color-purple-500: #00BCD4;
+  --color-purple-600: #00A5BB;
+  --color-purple-700: #008FA0;
+  --color-purple-800: #007280;
+  --color-purple-900: #0F2A2E;
+
+  /* ── Colores Admin (Dark Theme) ── */
+  --color-dark-900: #0A1A1F;
+  --color-dark-800: #0F2A2E;
+  --color-dark-700: #183840;
+  --color-dark-600: #1E4550;
+  --color-dark-500: #255260;
+
+  /* ── Tipografía ── */
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+}
+
+/* ── Google Fonts loaded above ── */
+
+/* ═══════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: #0a2a2e;
+  background: #FFF0F7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR PERSONALIZADO
+   ═══════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF0F7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF3DA8, #00BCD4);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #E0258E, #008FA0);
+}
+
+/* ═══════════════════════════════════════════
+   GLASSMORPHISM UTILITIES
+   ═══════════════════════════════════════════ */
+
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 46, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-pink {
+  background: rgba(255, 61, 168, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 61, 168, 0.15);
+}
+
+/* ═══════════════════════════════════════════
+   GRADIENT UTILITIES
+   ═══════════════════════════════════════════ */
+
+.gradient-primary {
+  background: linear-gradient(135deg, #FF3DA8, #00BCD4);
+}
+
+.gradient-primary-hover {
+  background: linear-gradient(135deg, #E0258E, #008FA0);
+}
+
+.gradient-soft {
+  background: linear-gradient(135deg, #FFB3E0, #B2EBF2);
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, #FFF0F7 0%, #FFD6EE 30%, #B2EBF2 70%, #80DEEA 100%);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #FF3DA8, #00BCD4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTON STYLES
+   ═══════════════════════════════════════════ */
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF3DA8, #00BCD4);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 61, 168, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #FF3DA8;
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 2px solid #FF3DA8;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #FF3DA8, #00BCD4);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 61, 168, 0.3);
+}
+
+/* ═══════════════════════════════════════════
+   CARD STYLES
+   ═══════════════════════════════════════════ */
+
+.card-premium {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(255, 61, 168, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 61, 168, 0.06);
+}
+
+.card-premium:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(255, 61, 168, 0.15);
+  border-color: rgba(0, 188, 212, 0.2);
+}
+
+/* ═══════════════════════════════════════════
+   GLOW EFFECTS
+   ═══════════════════════════════════════════ */
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 61, 168, 0.3),
+              0 0 40px rgba(255, 61, 168, 0.15);
+}
+
+.glow-turquoise {
+  box-shadow: 0 0 20px rgba(0, 188, 212, 0.3),
+              0 0 40px rgba(0, 188, 212, 0.15);
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 61, 168, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 61, 168, 0.6); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ═══════════════════════════════════════════
+   LOADER
+   ═══════════════════════════════════════════ */
+
+.loader-nail {
+  width: 40px;
+  height: 56px;
+  background: linear-gradient(135deg, #FF3DA8, #00BCD4);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  animation: float 1.5s ease-in-out infinite;
+}
+
+.loader-nail::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 14px;
+  background: rgba(255, 61, 168, 0.3);
+  border-radius: 4px 4px 0 0;
+}
+
+
+
+/* ═══════════════════════════════════════════
+   ADMIN THEME
+   ═══════════════════════════════════════════ */
+
+.admin-body {
+  background: #0A1A1F;
+  color: #E2E8F0;
+}
+
+.admin-card {
+  background: #0F2A2E;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+  border-color: rgba(255, 61, 168, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 188, 212, 0.1);
+}
+
+.admin-input {
+  background: #183840;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #E2E8F0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  outline: none;
+  width: 100%;
+}
+
+.admin-input:focus {
+  border-color: #FF3DA8;
+  box-shadow: 0 0 0 3px rgba(255, 61, 168, 0.15);
+}
+
+.admin-input::placeholder {
+  color: #6B7280;
+}
+
+/* ═══════════════════════════════════════════
+   WHATSAPP BUTTON
+   ═══════════════════════════════════════════ */
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 28px;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  cursor: pointer;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR HIDE UTILITY
+   ═══════════════════════════════════════════ */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+/* === MOBILE (hasta 640px) === */
+@media (max-width: 640px) {
+  .btn-primary, .btn-outline {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .card-premium:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Hacer botones e inputs touch-friendly */
+  input, select, textarea, button {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+
+  /* WhatsApp button más pequeño en mobile */
+  .whatsapp-float {
+    width: 52px;
+    height: 52px;
+    bottom: 16px;
+    right: 16px;
+    font-size: 24px;
+  }
+
+  /* Admin cards sin hover transform en mobile */
+  .admin-card:hover {
+    transform: none;
+  }
+}
+
+/* === TABLET (641px - 1024px) === */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .btn-primary, .btn-outline {
+    padding: 11px 28px;
+    font-size: 0.9rem;
+  }
+
+  .whatsapp-float {
+    width: 56px;
+    height: 56px;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+/* === DESKTOP (1025px+) === */
+@media (min-width: 1025px) {
+  .btn-primary, .btn-outline {
+    padding: 12px 32px;
+    font-size: 0.95rem;
+  }
+}
+
+/* === SAFE AREA para iPhones con notch === */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .whatsapp-float {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* === REDUCE MOTION para accesibilidad === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
