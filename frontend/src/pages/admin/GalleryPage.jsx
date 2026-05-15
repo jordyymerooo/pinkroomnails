@@ -97,7 +97,7 @@ export default function GalleryPage() {
             className="group relative aspect-[4/5] rounded-[2rem] overflow-hidden bg-gray-900 border border-gray-800 transition-all duration-500 hover:border-fuchsia-500/50 hover:shadow-2xl hover:shadow-fuchsia-500/10"
           >
             <img 
-              src={`/storage/${img.image_path}`} 
+              src={img.full_url || `/storage/${img.image_path}`} 
               alt={img.title} 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
             />

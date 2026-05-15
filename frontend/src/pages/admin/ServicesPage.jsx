@@ -176,8 +176,8 @@ export default function ServicesPage() {
                 {categoryServices.map((s, i) => (
                   <motion.div key={s.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileHover={{ y: -5 }} className="group relative bg-gray-950 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md shadow-lg">
                     <div className="h-40 bg-gray-900 relative">
-                      {s.image_path || s.image ? (
-                        <img src={`/storage/${s.image_path || s.image}`} className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-all duration-700" alt={s.name} />
+                      {s.image_url || s.image_path || s.image ? (
+                        <img src={s.image_url || `/storage/${s.image_path || s.image}`} className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-all duration-700" alt={s.name} />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-fuchsia-900/10 to-black">
                           <Sparkles className="text-fuchsia-500/20" size={40} />
@@ -269,7 +269,7 @@ export default function ServicesPage() {
                   <label className="text-sm text-gray-400 mb-1 block">Image</label>
                   {editing && editing.image && !deleteImage && (
                     <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden group">
-                      <img src={`/storage/${editing.image}`} className="w-full h-full object-cover" alt="Current" />
+                      <img src={editing.image_url || `/storage/${editing.image}`} className="w-full h-full object-cover" alt="Current" />
                       <button 
                         type="button" 
                         onClick={() => setDeleteImage(true)}

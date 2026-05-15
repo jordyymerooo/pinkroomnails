@@ -126,7 +126,7 @@ export default function ServicesSection() {
                     <div className="aspect-video relative overflow-hidden">
                       {service.image ? (
                         <img 
-                          src={`/storage/${service.image}`} 
+                          src={service.image_url || `/storage/${service.image}`} 
                           alt={service.name}
                           className="w-full h-full object-cover" 
                         />

@@ -104,7 +104,7 @@ export default function GallerySection() {
                         className="relative aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden cursor-pointer group shadow-lg hover:shadow-xl transition-all border border-white/20"
                       >
                         <img 
-                          src={`/storage/${image.image_path}`} 
+                          src={image.full_url || `/storage/${image.image_path}`} 
                           alt={image.title || 'Nail Design'}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -149,7 +149,7 @@ export default function GallerySection() {
                <span className="text-4xl">&times;</span>
             </motion.button>
             <motion.img initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
-              src={`/storage/${selectedImage.image_path}`} alt={selectedImage.title || 'Design'}
+              src={selectedImage.full_url || `/storage/${selectedImage.image_path}`} alt={selectedImage.title || 'Design'}
               className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl" />
           </motion.div>
         )}
