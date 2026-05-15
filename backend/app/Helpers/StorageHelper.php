@@ -24,35 +24,13 @@ class StorageHelper
         $disk = self::disk();
 
         if ($disk === 'supabase') {
-            $secret = env('SUPABASE_STORAGE_SECRET');
-            $storageUrl = env('SUPABASE_STORAGE_URL');
-            
-            // Si faltan las variables de Supabase, hacemos fallback a public inmediatamente
-            if (!empty($secret) && !empty($storageUrl)) {
-                try {
-                    $filename = uniqid() . '_' . $file->getClientOriginalName();
-                    $path = $folder . '/' . $filename;
-                    
-                    $baseUrl = str_replace('/object/public', '', $storageUrl);
-                    $uploadUrl = rtrim($baseUrl, '/') . '/object/images/' . $path;
-                    
-                    $response = \Illuminate\Support\Facades\Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $secret,
-                        'Content-Type'  => $file->getMimeType(),
-                    ])->send('POST', $uploadUrl, [
-                        'body' => file_get_contents($file->getRealPath())
-                    ]);
-
-                    if ($response->successful()) {
-                        return $path;
-                    }
-                    
-                    \Illuminate\Support\Facades\Log::error('Supabase upload failed: ' . $response->body());
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Supabase upload exception: ' . $e->getMessage());
-                }
-            } else {
-                \Illuminate\Support\Facades\Log::warning('Supabase variables missing. Falling back to public disk.');
+            // Utilizamos el driver S3 configurado en filesystems.php
+            // El usuario tiene credenciales S3 válidas, por lo que storePublicly funcionará.
+            try {
+                return $file->storePublicly($folder, ['disk' => 'supabase']);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('S3 upload exception: ' . $e->getMessage());
+                // Fallback a public si la subida a S3 falla
             }
         }
 
