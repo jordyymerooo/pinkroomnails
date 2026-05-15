@@ -34,12 +34,18 @@ class ServiceController extends Controller
     }
 
     /**
-     * Crear servicio (admin)
-     * Nota: is_active llega como string "1"/"0" desde FormData, por eso se usa
-     * la regla 'in:0,1,true,false' en lugar de 'boolean' puro.
+     * Crear servicio (admin).
+     * 
+     * El frontend envía FormData, por lo que todos los valores llegan
+     * como strings ("1"/"0" para booleanos). Se normalizan antes de validar.
      */
     public function store(Request $request)
     {
+        // ─── Normalizar booleanos que vienen de FormData como strings ───
+        $request->merge([
+            'is_active' => filter_var($request->input('is_active', true), FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'nullable|string',
@@ -47,13 +53,14 @@ class ServiceController extends Controller
             'duration_minutes' => 'required|integer|min:1',
             'image'            => 'nullable|image|max:10240',
             'category'         => 'nullable|string|max:100',
-            'is_active'        => 'nullable|in:0,1,true,false',
+            'is_active'        => 'boolean',
             'sort_order'       => 'nullable|integer',
         ]);
 
         // Verificar duplicado por nombre + categoría antes de insertar
+        $categoryValue = $validated['category'] ?? 'general';
         $exists = Service::where('name', $validated['name'])
-            ->where('category', $validated['category'] ?? null)
+            ->where('category', $categoryValue)
             ->exists();
 
         if ($exists) {
@@ -63,16 +70,13 @@ class ServiceController extends Controller
             ], 422);
         }
 
-        // Normalizar is_active: FormData lo manda como string "1" / "0"
-        $validated['is_active'] = filter_var($validated['is_active'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        // Asignar sort_order automático si no viene
+        if (empty($validated['sort_order'])) {
+            $validated['sort_order'] = (Service::max('sort_order') ?? 0) + 1;
+        }
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('services', 'public');
-        }
-
-        // Asignar sort_order automático si no viene
-        if (!isset($validated['sort_order'])) {
-            $validated['sort_order'] = (Service::max('sort_order') ?? 0) + 1;
         }
 
         $service = Service::create($validated);
@@ -81,11 +85,18 @@ class ServiceController extends Controller
     }
 
     /**
-     * Actualizar servicio (admin)
+     * Actualizar servicio (admin).
      * Se expone como POST en lugar de PUT/PATCH para soportar FormData con imagen.
      */
     public function update(Request $request, Service $service)
     {
+        // ─── Normalizar booleanos que vienen de FormData como strings ───
+        if ($request->has('is_active')) {
+            $request->merge([
+                'is_active' => filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN),
+            ]);
+        }
+
         $validated = $request->validate([
             'name'             => 'sometimes|required|string|max:255',
             'description'      => 'nullable|string',
@@ -93,16 +104,11 @@ class ServiceController extends Controller
             'duration_minutes' => 'sometimes|required|integer|min:1',
             'image'            => 'nullable|image|max:10240',
             'category'         => 'nullable|string|max:100',
-            'is_active'        => 'nullable|in:0,1,true,false',
+            'is_active'        => 'sometimes|boolean',
             'sort_order'       => 'nullable|integer',
         ]);
 
-        // Normalizar is_active desde FormData
-        if (array_key_exists('is_active', $validated)) {
-            $validated['is_active'] = filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN);
-        }
-
-        // Manejo de eliminación de imagen
+        // Eliminar imagen si se solicitó
         if ($request->input('delete_image') == 1) {
             if ($service->image) {
                 Storage::disk('public')->delete($service->image);
