@@ -57,7 +57,7 @@ return [
             'url'                     => env('SUPABASE_STORAGE_URL', ''),
             'endpoint'                => env('SUPABASE_STORAGE_ENDPOINT', ''),
             'use_path_style_endpoint' => true,
-            'throw'                   => false,
+            'throw'                   => true,
             'report'                  => false,
         ],
 
