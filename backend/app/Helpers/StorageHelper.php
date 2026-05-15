@@ -24,39 +24,36 @@ class StorageHelper
         $disk = self::disk();
 
         if ($disk === 'supabase') {
-            // Upload using Supabase REST API directly
-            $filename = uniqid() . '_' . $file->getClientOriginalName();
-            $path = $folder . '/' . $filename;
+            $secret = env('SUPABASE_STORAGE_SECRET');
+            $storageUrl = env('SUPABASE_STORAGE_URL');
             
-            $url = env('SUPABASE_STORAGE_ENDPOINT') . '/object/images/' . $path; // images is the bucket name
-            // If SUPABASE_STORAGE_ENDPOINT is the S3 endpoint, we need to fix it:
-            // e.g. https://ohbenoeiqlkcmhksbgnz.supabase.co/storage/v1
-            $baseUrl = str_replace('/s3', '', env('SUPABASE_STORAGE_ENDPOINT'));
-            if (!str_contains($baseUrl, 'storage/v1')) {
-                // Construct from DB_HOST
-                $projectRef = explode('.', env('DB_HOST'))[0]; 
-                // DB_HOST might be aws-1-us-east-1.pooler.supabase.com, so we shouldn't rely on it.
-                // We'll use SUPABASE_STORAGE_URL which is the public object URL:
-                // https://ohbenoeiqlkcmhksbgnz.supabase.co/storage/v1/object/public
-                $baseUrl = str_replace('/object/public', '', env('SUPABASE_STORAGE_URL'));
-            }
-            
-            $uploadUrl = rtrim($baseUrl, '/') . '/object/images/' . $path;
-            
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('SUPABASE_STORAGE_SECRET'), // service_role key
-                'Content-Type'  => $file->getMimeType(),
-            ])->send('POST', $uploadUrl, [
-                'body' => file_get_contents($file->getRealPath())
-            ]);
+            // Si faltan las variables de Supabase, hacemos fallback a public inmediatamente
+            if (!empty($secret) && !empty($storageUrl)) {
+                try {
+                    $filename = uniqid() . '_' . $file->getClientOriginalName();
+                    $path = $folder . '/' . $filename;
+                    
+                    $baseUrl = str_replace('/object/public', '', $storageUrl);
+                    $uploadUrl = rtrim($baseUrl, '/') . '/object/images/' . $path;
+                    
+                    $response = \Illuminate\Support\Facades\Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $secret,
+                        'Content-Type'  => $file->getMimeType(),
+                    ])->send('POST', $uploadUrl, [
+                        'body' => file_get_contents($file->getRealPath())
+                    ]);
 
-            if ($response->successful()) {
-                return $path;
+                    if ($response->successful()) {
+                        return $path;
+                    }
+                    
+                    \Illuminate\Support\Facades\Log::error('Supabase upload failed: ' . $response->body());
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Supabase upload exception: ' . $e->getMessage());
+                }
+            } else {
+                \Illuminate\Support\Facades\Log::warning('Supabase variables missing. Falling back to public disk.');
             }
-            
-            // If it fails, fallback to local so it doesn't crash completely,
-            // or log the error.
-            \Illuminate\Support\Facades\Log::error('Supabase upload failed: ' . $response->body());
         }
 
         return $file->store($folder, 'public');
