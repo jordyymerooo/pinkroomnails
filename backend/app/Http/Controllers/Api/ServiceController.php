@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
@@ -76,7 +76,7 @@ class ServiceController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('services', 'public');
+            $validated['image'] = StorageHelper::store($request->file('image'), 'services');
         }
 
         $service = Service::create($validated);
@@ -110,18 +110,14 @@ class ServiceController extends Controller
 
         // Eliminar imagen si se solicitó
         if ($request->input('delete_image') == 1) {
-            if ($service->image) {
-                Storage::disk('public')->delete($service->image);
-            }
+            StorageHelper::delete($service->image);
             $service->image = null;
         }
 
         // Reemplazar imagen si viene una nueva
         if ($request->hasFile('image')) {
-            if ($service->image) {
-                Storage::disk('public')->delete($service->image);
-            }
-            $validated['image'] = $request->file('image')->store('services', 'public');
+            StorageHelper::delete($service->image);
+            $validated['image'] = StorageHelper::store($request->file('image'), 'services');
         }
 
         $service->fill($validated);
@@ -135,10 +131,7 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        if ($service->image) {
-            Storage::disk('public')->delete($service->image);
-        }
-
+        StorageHelper::delete($service->image);
         $service->delete();
 
         return response()->json(['message' => 'Servicio eliminado correctamente.']);
