@@ -38,6 +38,16 @@ Route::post('/appointments', [AppointmentController::class, 'store']);
 // Configuraciones públicas
 Route::get('/settings', [SettingController::class, 'index']);
 
+// Debug env
+Route::get('/debug-env', function() {
+    return [
+        'upload_max_filesize' => ini_get('upload_max_filesize'),
+        'post_max_size' => ini_get('post_max_size'),
+        'disk' => env('FILESYSTEM_DISK'),
+        'has_secret' => !empty(env('SUPABASE_STORAGE_SECRET')),
+    ];
+});
+
 /*
 |--------------------------------------------------------------------------
 | Rutas de Autenticación
