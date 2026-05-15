@@ -24,8 +24,39 @@ class StorageHelper
         $disk = self::disk();
 
         if ($disk === 'supabase') {
-            // Supabase Storage requiere visibilidad explícita 'public'
-            return $file->storePublicly($folder, ['disk' => 'supabase']);
+            // Upload using Supabase REST API directly
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $path = $folder . '/' . $filename;
+            
+            $url = env('SUPABASE_STORAGE_ENDPOINT') . '/object/images/' . $path; // images is the bucket name
+            // If SUPABASE_STORAGE_ENDPOINT is the S3 endpoint, we need to fix it:
+            // e.g. https://ohbenoeiqlkcmhksbgnz.supabase.co/storage/v1
+            $baseUrl = str_replace('/s3', '', env('SUPABASE_STORAGE_ENDPOINT'));
+            if (!str_contains($baseUrl, 'storage/v1')) {
+                // Construct from DB_HOST
+                $projectRef = explode('.', env('DB_HOST'))[0]; 
+                // DB_HOST might be aws-1-us-east-1.pooler.supabase.com, so we shouldn't rely on it.
+                // We'll use SUPABASE_STORAGE_URL which is the public object URL:
+                // https://ohbenoeiqlkcmhksbgnz.supabase.co/storage/v1/object/public
+                $baseUrl = str_replace('/object/public', '', env('SUPABASE_STORAGE_URL'));
+            }
+            
+            $uploadUrl = rtrim($baseUrl, '/') . '/object/images/' . $path;
+            
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SUPABASE_STORAGE_SECRET'), // service_role key
+                'Content-Type'  => $file->getMimeType(),
+            ])->send('POST', $uploadUrl, [
+                'body' => file_get_contents($file->getRealPath())
+            ]);
+
+            if ($response->successful()) {
+                return $path;
+            }
+            
+            // If it fails, fallback to local so it doesn't crash completely,
+            // or log the error.
+            \Illuminate\Support\Facades\Log::error('Supabase upload failed: ' . $response->body());
         }
 
         return $file->store($folder, 'public');
@@ -39,7 +70,18 @@ class StorageHelper
         if (!$path) return;
 
         $disk = self::disk();
-        Storage::disk($disk === 'supabase' ? 'supabase' : 'public')->delete($path);
+        
+        if ($disk === 'supabase') {
+            $baseUrl = str_replace('/object/public', '', env('SUPABASE_STORAGE_URL'));
+            $deleteUrl = rtrim($baseUrl, '/') . '/object/images/' . $path;
+            
+            \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SUPABASE_STORAGE_SECRET'),
+            ])->delete($deleteUrl);
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 
     /**
@@ -47,10 +89,13 @@ class StorageHelper
      */
     public static function url(string $path): string
     {
+        if (!$path) return '';
+        
         $disk = self::disk();
 
         if ($disk === 'supabase') {
-            return Storage::disk('supabase')->url($path);
+            $publicUrl = env('SUPABASE_STORAGE_URL');
+            return rtrim($publicUrl, '/') . '/images/' . $path;
         }
 
         return Storage::disk('public')->url($path);
